@@ -1,4 +1,3 @@
-```java
 package com.gmail.detection.config;
 
 import com.google.api.client.auth.oauth2.Credential;
@@ -39,17 +38,11 @@ public class GmailConfig {
 
     private static final String TOKENS_DIRECTORY_PATH = "tokens";
 
-    /**
-     * Creates Gmail API service lazily.
-     *
-     * @Lazy prevents Gmail OAuth from running while the application
-     * is starting. The Gmail service is created only when it is needed.
-     */
     @Bean
     @Lazy
     public Gmail gmailService() throws Exception {
 
-        System.out.println("\n==========================================");
+        System.out.println("==========================================");
         System.out.println("      Gmail Configuration Started");
         System.out.println("==========================================");
 
@@ -67,21 +60,11 @@ public class GmailConfig {
                 .build();
 
         System.out.println("Gmail API Connected Successfully.");
-        System.out.println("==========================================\n");
+        System.out.println("==========================================");
 
         return gmail;
     }
 
-    /**
-     * Creates Google OAuth credentials.
-     *
-     * The application first looks for GOOGLE_CREDENTIALS_JSON
-     * environment variable. This is the recommended approach
-     * for Render/production.
-     *
-     * If the environment variable does not exist, it falls back
-     * to credentials.json inside src/main/resources for local development.
-     */
     private Credential authorize()
             throws IOException, GeneralSecurityException {
 
@@ -90,13 +73,9 @@ public class GmailConfig {
         InputStream inputStream = null;
 
         /*
-         * ============================================================
-         * OPTION 1: Render / Production
-         * ============================================================
-         *
-         * Render should contain:
-         *
-         * GOOGLE_CREDENTIALS_JSON=<complete credentials.json content>
+         * Production / Render:
+         * GOOGLE_CREDENTIALS_JSON must contain the complete
+         * credentials.json content.
          */
         String credentialsJson =
                 System.getenv("GOOGLE_CREDENTIALS_JSON");
@@ -112,18 +91,12 @@ public class GmailConfig {
             );
 
             System.out.println(
-                    "Google credentials loaded from environment variable."
+                    "Google credentials loaded successfully."
             );
         }
 
         /*
-         * ============================================================
-         * OPTION 2: Local Development
-         * ============================================================
-         *
-         * If GOOGLE_CREDENTIALS_JSON isn't available, look for:
-         *
-         * src/main/resources/credentials.json
+         * Local development fallback.
          */
         if (inputStream == null) {
 
@@ -145,8 +118,8 @@ public class GmailConfig {
                 throw new RuntimeException(
                         "Google OAuth credentials not found. " +
                         "Set GOOGLE_CREDENTIALS_JSON in Render " +
-                        "or place credentials.json inside " +
-                        "src/main/resources for local development."
+                        "or put credentials.json in " +
+                        "src/main/resources."
                 );
             }
 
@@ -155,9 +128,6 @@ public class GmailConfig {
             );
         }
 
-        /*
-         * Read Google OAuth client configuration.
-         */
         GoogleClientSecrets clientSecrets =
                 GoogleClientSecrets.load(
                         JSON_FACTORY,
@@ -171,11 +141,6 @@ public class GmailConfig {
                 "Google Client Secrets loaded successfully."
         );
 
-        /*
-         * ============================================================
-         * Create OAuth Flow
-         * ============================================================
-         */
         System.out.println("Building OAuth Flow...");
 
         GoogleAuthorizationCodeFlow flow =
@@ -195,16 +160,6 @@ public class GmailConfig {
 
         System.out.println("OAuth Flow Created.");
 
-        /*
-         * ============================================================
-         * Local OAuth Login
-         * ============================================================
-         *
-         * This part is suitable for LOCAL development.
-         *
-         * Render cannot open a browser automatically, so this
-         * interactive flow should not be relied upon for production.
-         */
         LocalServerReceiver receiver =
                 new LocalServerReceiver.Builder()
                         .setPort(8888)
@@ -212,8 +167,8 @@ public class GmailConfig {
 
         System.out.println("------------------------------------------");
         System.out.println("Opening Google Login Page...");
-        System.out.println("If browser doesn't open:");
-        System.out.println("Copy the URL from console into browser.");
+        System.out.println("If browser doesn't open, copy");
+        System.out.println("the URL from the console.");
         System.out.println("------------------------------------------");
 
         Credential credential =
